@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:;"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://*.googleapis.com https://*.firebasedatabase.app wss://*.firebasedatabase.app;"/>
 <meta name="description" content="TOSM Boss Spawn Timer — ระบบติดตามเวลาเกิดบอส Tree of Savior M แบบ real-time พร้อมแจ้งเตือนอัตโนมัติ"/>
 <meta name="theme-color" content="#080c14"/>
 <meta property="og:title" content="TOSM Boss Spawn Timer"/>
@@ -165,7 +165,20 @@ tbody tr.just-reset{animation:flashGreen 1s ease}
 @media(max-width:768px){.form-row{grid-template-columns:1fr 1fr}.form-row-2{grid-template-columns:1fr auto auto}.header h1{font-size:1.6rem}.desktop-table{display:none!important}.mobile-cards{display:block}}
 @media(max-width:480px){.form-row{grid-template-columns:1fr}.form-row-2{grid-template-columns:1fr}.container{padding:14px 10px}.phase-btn{padding:8px 12px;font-size:.78rem}}
 @media(min-width:769px){.mobile-cards{display:none!important}}
+.room-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.room-bar label{font-size:.8rem;color:var(--text-secondary);font-weight:600;display:flex;align-items:center;gap:5px}
+.room-bar input{background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--accent);font-family:"Inter",sans-serif;font-size:.85rem;font-weight:700;text-align:center;outline:none;width:160px;letter-spacing:.05em;transition:border-color .2s}
+.room-bar input:focus{border-color:var(--accent)}
+.room-bar .btn-room{padding:7px 14px;font-size:.8rem}
+.conn-status{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;font-weight:600;padding:4px 10px;border-radius:20px}
+.conn-status.online{color:var(--success);background:rgba(34,197,94,.1)}
+.conn-status.offline{color:var(--accent2);background:rgba(239,68,68,.1)}
+.conn-dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.conn-dot.online{background:var(--success);box-shadow:0 0 6px var(--success)}
+.conn-dot.offline{background:var(--accent2)}
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 </head>
 <body>
 <noscript><div style="background:#1e1e2e;color:#f59e0b;text-align:center;padding:40px;font-family:sans-serif;font-size:1.2rem">⚠️ กรุณาเปิด JavaScript เพื่อใช้งาน TOSM Boss Timer</div></noscript>
@@ -173,6 +186,12 @@ tbody tr.just-reset{animation:flashGreen 1s ease}
 <div class="header">
 <h1>⚔️ TOSM Boss Timer</h1>
 <p>Tree of Savior M — ระบบติดตามเวลาเกิดบอส</p>
+<div class="room-bar">
+<label>🏠 ห้อง:</label>
+<input type="text" id="roomInput" placeholder="default" maxlength="30" onkeydown="if(event.key==='Enter')joinRoom()"/>
+<button class="btn btn-sm btn-primary btn-room" onclick="joinRoom()">เข้าห้อง</button>
+<span class="conn-status offline" id="connStatus"><span class="conn-dot offline" id="connDot"></span> <span id="connText">Offline</span></span>
+</div>
 </div>
 
 <div class="form-card">
@@ -320,6 +339,26 @@ const TYPE_CSS={field:"type-field",world:"type-world",demon:"type-demon"};
 // ===== Phase Configuration =====
 const PHASE_MINUTES={1:20, 2:10, 3:5, 4:5};
 let currentPhase=1;
+
+// ===== Firebase Configuration =====
+const FIREBASE_CONFIG={
+  apiKey:"AIzaSyANY5fbMIh8kWCmcfwTIukNqYySxx74pnQ",
+  authDomain:"tosm-boss-timer-3ac91.firebaseapp.com",
+  databaseURL:"https://tosm-boss-timer-3ac91-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"tosm-boss-timer-3ac91",
+  storageBucket:"tosm-boss-timer-3ac91.firebasestorage.app",
+  messagingSenderId:"346747787143",
+  appId:"1:346747787143:web:2c5aeead01b14c02c6a522"
+};
+let firebaseReady=false;
+let fbDb=null;
+let currentRoom=localStorage.getItem("tosmRoom")||"default";
+let dbListenerRef=null;
+try{
+  firebase.initializeApp(FIREBASE_CONFIG);
+  fbDb=firebase.database();
+  firebaseReady=true;
+}catch(e){console.warn("Firebase init failed, local mode:",e)}
 
 // ===== EP-based Boss Database =====
 const EP_BOSSES={
@@ -581,7 +620,13 @@ function cancelEditRespawn(){editingRespawnId=null;renderTable()}
 
 function deleteBoss(id){const b=bosses.find(x=>x.id===id);showConfirm("🗑 ลบบอส",`ลบ "${b?b.name:"บอส"}" ?`,()=>{bosses=bosses.filter(x=>x.id!==id);alertedSet.delete(id);saveBosses();renderTable()})}
 function clearAllBosses(){if(!bosses.length)return;showConfirm("⚠️ ลบทั้งหมด",`ลบบอสทั้งหมด ${bosses.length} รายการ?`,()=>{bosses=[];alertedSet.clear();saveBosses();renderTable()})}
-function saveBosses(){try{localStorage.setItem("tosmBossTimers",JSON.stringify(bosses))}catch(e){console.error("Failed to save bosses:",e);showToast("⚠️","บันทึกข้อมูลไม่ได้","localStorage เต็มหรือถูกบล็อก")}}
+function saveBosses(){
+  try{localStorage.setItem("tosmBossTimers",JSON.stringify(bosses))}catch(e){console.error("localStorage error:",e)}
+  if(firebaseReady&&dbListenerRef){
+    const m={};bosses.forEach(b=>{m[b.id]=b});
+    dbListenerRef.set(m).catch(e=>{console.error("Firebase save error:",e);showToast("⚠️","Sync ไม่สำเร็จ",e.message)});
+  }
+}
 
 function showConfirm(title,msg,cb){document.getElementById("confirmTitle").textContent=title;document.getElementById("confirmMessage").textContent=msg;confirmCallback=cb;document.getElementById("confirmModal").style.display="flex"}
 function closeConfirm(){document.getElementById("confirmModal").style.display="none";confirmCallback=null}
@@ -678,10 +723,53 @@ bosses.forEach(b=>{const d=getTimeDiffSeconds(b,now);if(d>0&&d<=as&&!alertedSet.
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&["bossName","bossMap","bossTime"].includes(e.target.id))addBoss()});
 document.getElementById("muteBtn").textContent=muted?"🔇 ปิดเสียง":"🔊 เปิดเสียง";
 
+// ===== Firebase Sync Functions =====
+function attachFirebaseListener(){
+  if(!firebaseReady)return;
+  if(dbListenerRef)dbListenerRef.off();
+  dbListenerRef=fbDb.ref("rooms/"+currentRoom+"/bosses");
+  dbListenerRef.on("value",snap=>{
+    const data=snap.val();
+    bosses=data?Object.values(data):[];
+    bosses.forEach(b=>{if(!b.customRespawn)b.customRespawn=DEFAULT_RESPAWN[b.type]||4});
+    try{localStorage.setItem("tosmBossTimers",JSON.stringify(bosses))}catch(e){}
+    renderTable();
+  },err=>{
+    console.error("Firebase read error:",err);
+    showToast("⚠️","Firebase sync error",err.message);
+  });
+}
+
+function joinRoom(){
+  const inp=document.getElementById("roomInput");
+  const r=(inp.value.trim()||"default").toLowerCase().replace(/[^a-z0-9_-]/g,"");
+  if(!r){inp.value=currentRoom;return}
+  if(r===currentRoom){showToast("🏠","อยู่ห้องนี้แล้ว",currentRoom);return}
+  currentRoom=r;inp.value=r;
+  localStorage.setItem("tosmRoom",currentRoom);
+  alertedSet.clear();recentlyReset.clear();editingRespawnId=null;
+  attachFirebaseListener();
+  showToast("🏠",'เข้าห้อง "'+currentRoom+'"',"ข้อมูล sync กับคนในห้องเดียวกัน",true);
+}
+
+function initConnectionStatus(){
+  if(!firebaseReady)return;
+  fbDb.ref(".info/connected").on("value",snap=>{
+    const on=snap.val()===true;
+    const s=document.getElementById("connStatus"),d=document.getElementById("connDot"),t=document.getElementById("connText");
+    if(s)s.className="conn-status "+(on?"online":"offline");
+    if(d)d.className="conn-dot "+(on?"online":"offline");
+    if(t)t.textContent=on?"Online":"Offline";
+  });
+}
+
 // Initialize
 initEPTabs();
 updatePhasePreview();
 renderTable();
+document.getElementById("roomInput").value=currentRoom;
+initConnectionStatus();
+attachFirebaseListener();
 if("Notification"in window&&Notification.permission==="default"){try{Notification.requestPermission()}catch(e){}}
 setInterval(()=>{updateTimers();checkAlerts();updatePhasePreview()},1e3);
 </script>
