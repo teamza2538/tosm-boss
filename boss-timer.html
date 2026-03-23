@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:;"/>
+<meta name="description" content="TOSM Boss Spawn Timer — ระบบติดตามเวลาเกิดบอส Tree of Savior M แบบ real-time พร้อมแจ้งเตือนอัตโนมัติ"/>
+<meta name="theme-color" content="#080c14"/>
+<meta property="og:title" content="TOSM Boss Spawn Timer"/>
+<meta property="og:description" content="ระบบติดตามเวลาเกิดบอส Tree of Savior M — Field Boss, World Boss, Demon Lord"/>
+<meta property="og:type" content="website"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>"/>
+<title>TOSM Boss Spawn Timer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-primary:#080c14;--bg-card:#131a2b;--bg-input:#0b1120;--border:#1e2d4a;--text-primary:#e2e8f0;--text-secondary:#94a3b8;--text-muted:#64748b;--accent:#f59e0b;--accent2:#ef4444;--success:#22c55e;--warning:#f59e0b;--urgent:#ef4444;--gradient-1:linear-gradient(135deg,#f59e0b,#ef4444);--gradient-field:linear-gradient(135deg,#22c55e,#059669);--gradient-world:linear-gradient(135deg,#f59e0b,#f97316);--gradient-demon:linear-gradient(135deg,#ef4444,#dc2626);--shadow-lg:0 10px 40px rgba(0,0,0,.5)}
+body{font-family:"Inter",sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(245,158,11,.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(239,68,68,.05) 0%,transparent 50%);pointer-events:none;z-index:0}
+.container{max-width:1100px;margin:0 auto;padding:24px 16px;position:relative;z-index:1}
+.header{text-align:center;margin-bottom:28px}
+.header h1{font-size:2.2rem;font-weight:800;background:var(--gradient-1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+.header p{color:var(--text-muted);font-size:.9rem}
+.form-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:22px;box-shadow:var(--shadow-lg)}
+.form-card h2{font-size:1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.form-row{display:grid;grid-template-columns:1fr 1fr 1fr 90px;gap:12px;align-items:end}
+.form-row-2{display:grid;grid-template-columns:1fr auto auto auto;gap:12px;align-items:end;margin-top:12px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:.75rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em}
+.form-group input,.form-group select{background:var(--bg-input);border:1px solid var(--border);border-radius:9px;padding:10px 12px;color:var(--text-primary);font-family:"Inter",sans-serif;font-size:.88rem;outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent)}
+.form-group input::placeholder{color:var(--text-muted)}
+.form-group select{cursor:pointer}
+.form-group select option{background:var(--bg-card);color:var(--text-primary)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:10px 18px;border:none;border-radius:9px;font-family:"Inter",sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-primary{background:var(--gradient-1);color:#fff;box-shadow:0 4px 12px rgba(245,158,11,.25)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(245,158,11,.35)}
+.btn-success{background:var(--gradient-field);color:#fff}
+.btn-success:hover{transform:translateY(-1px)}
+.btn-danger{background:var(--accent2);color:#fff;padding:6px 10px;font-size:.78rem;border-radius:7px}
+.btn-danger:hover{background:#f87171}
+.btn-outline-danger{background:rgba(239,68,68,.1);color:var(--accent2);border:1px solid rgba(239,68,68,.3);padding:6px 12px;font-size:.78rem;border-radius:7px}
+.btn-outline-danger:hover{background:rgba(239,68,68,.2)}
+.btn-sm{padding:6px 10px;font-size:.75rem;border-radius:7px}
+.btn-mute{background:rgba(245,158,11,.12);color:var(--accent)}
+.btn-mute:hover{background:rgba(245,158,11,.22)}
+.settings-row{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
+.settings-row label{font-size:.8rem;color:var(--text-secondary);display:flex;align-items:center;gap:5px}
+.settings-row input[type="number"]{width:60px;background:var(--bg-input);border:1px solid var(--border);border-radius:7px;padding:5px 8px;color:var(--text-primary);font-family:"Inter",sans-serif;font-size:.82rem;outline:none}
+.respawn-input-inline{width:52px;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:3px 6px;color:var(--accent);font-family:"Inter",sans-serif;font-size:.78rem;font-weight:700;text-align:center;outline:none;transition:border-color .2s}
+.respawn-input-inline:focus{border-color:var(--accent)}
+.respawn-edit-wrap{display:inline-flex;align-items:center;gap:4px}
+.btn-edit{background:rgba(245,158,11,.12);color:var(--accent);padding:4px 7px;font-size:.72rem;border-radius:6px;border:none;cursor:pointer;font-family:"Inter",sans-serif;transition:background .2s}
+.btn-edit:hover{background:rgba(245,158,11,.25)}
+.btn-save-rs{background:var(--success);color:#fff;padding:4px 7px;font-size:.72rem;border-radius:6px;border:none;cursor:pointer;font-family:"Inter",sans-serif}
+.hint-text{font-size:.75rem;color:var(--text-muted);margin-top:10px;display:flex;align-items:center;gap:5px}
+.preset-section{margin-bottom:16px}
+.preset-section h3{font-size:.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.preset-grid{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
+.preset-grid select{background:var(--bg-input);border:1px solid var(--border);border-radius:9px;padding:10px 12px;color:var(--text-primary);font-family:"Inter",sans-serif;font-size:.85rem;outline:none;transition:border-color .2s;flex:1;min-width:140px;cursor:pointer}
+.preset-grid select:focus{border-color:var(--accent)}
+.preset-grid select option{background:var(--bg-card);color:var(--text-primary)}
+.preset-grid select optgroup{color:var(--accent);font-weight:700;font-style:normal}
+.btn-preset{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 4px 12px rgba(99,102,241,.25)}
+.btn-preset:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(99,102,241,.35)}
+.preset-info{font-size:.72rem;color:var(--text-muted);margin-top:8px;padding:8px 12px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);border-radius:8px;display:none;line-height:1.6}
+.preset-info.show{display:block}
+.preset-info strong{color:var(--text-secondary)}
+
+/* Phase selector styles */
+.phase-section{margin-bottom:16px}
+.phase-section h3{font-size:.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.phase-grid{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.phase-btn{padding:10px 18px;border:2px solid var(--border);border-radius:10px;background:var(--bg-input);color:var(--text-secondary);font-family:"Inter",sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.phase-btn:hover{border-color:var(--accent);color:var(--text-primary);background:rgba(245,158,11,.05)}
+.phase-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(245,158,11,.1);box-shadow:0 0 12px rgba(245,158,11,.15)}
+.phase-btn .phase-time{display:block;font-size:.68rem;color:var(--text-muted);margin-top:2px;font-weight:500}
+.phase-btn.active .phase-time{color:var(--accent)}
+.phase-result{display:none;margin-top:10px;padding:10px 14px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:9px;font-size:.82rem;color:var(--success);font-weight:600;animation:fadeIn .3s ease}
+.phase-result.show{display:flex;align-items:center;gap:8px}
+.phase-result .time-big{font-size:1.1rem;font-weight:800;color:#4ade80}
+
+/* EP Tab styles */
+.ep-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.ep-tab{padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg-input);color:var(--text-muted);font-family:"Inter",sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s}
+.ep-tab:hover{border-color:var(--accent);color:var(--text-primary)}
+.ep-tab.active{background:rgba(245,158,11,.12);border-color:var(--accent);color:var(--accent);box-shadow:0 0 8px rgba(245,158,11,.1)}
+
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+.table-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-lg)}
+.table-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.table-header h2{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.table-header-actions{display:flex;align-items:center;gap:8px}
+.badge{padding:3px 9px;border-radius:16px;font-size:.72rem;font-weight:600}
+.badge-count{background:rgba(245,158,11,.15);color:var(--accent)}
+.type-badge{padding:3px 9px;border-radius:5px;font-weight:700;font-size:.72rem;color:#fff}
+.type-field{background:rgba(34,197,94,.2);color:#4ade80}
+.type-world{background:rgba(245,158,11,.2);color:#fbbf24}
+.type-demon{background:rgba(239,68,68,.2);color:#f87171}
+table{width:100%;border-collapse:collapse}
+thead th{background:rgba(0,0,0,.3);padding:11px 14px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);border-bottom:1px solid var(--border)}
+tbody td{padding:12px 14px;font-size:.85rem;border-bottom:1px solid rgba(30,45,74,.5);vertical-align:middle}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:rgba(245,158,11,.03)}
+tbody tr.alert-soon{animation:pulseRow 1.5s ease-in-out infinite}
+tbody tr.just-reset{animation:flashGreen 1s ease}
+@keyframes pulseRow{0%,100%{background:rgba(239,68,68,.05)}50%{background:rgba(239,68,68,.12)}}
+@keyframes flashGreen{0%{background:rgba(34,197,94,.25)}100%{background:transparent}}
+.map-name{font-weight:600}
+.time-display{font-family:"Inter",monospace;font-weight:600;font-size:.82rem}
+.countdown{font-family:"Inter",monospace;font-weight:700;font-size:.9rem;letter-spacing:.02em}
+.countdown.safe{color:var(--success)}.countdown.warning{color:var(--warning)}.countdown.urgent{color:var(--urgent);animation:blink 1s ease-in-out infinite}.countdown.passed{color:var(--text-muted)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}
+.status-dot.active{background:var(--success);box-shadow:0 0 5px var(--success)}
+.status-dot.soon{background:var(--warning);box-shadow:0 0 5px var(--warning)}
+.status-dot.imminent{background:var(--urgent);box-shadow:0 0 5px var(--urgent)}
+.status-dot.passed{background:var(--text-muted)}
+.actions-cell{display:flex;gap:5px;align-items:center}
+.empty-state{padding:50px 20px;text-align:center;color:var(--text-muted)}
+.empty-state .icon{font-size:2.5rem;margin-bottom:10px;opacity:.4}
+.empty-state p{font-size:.9rem}
+.kill-toggle{position:relative;display:inline-flex;align-items:center;cursor:pointer;user-select:none;gap:6px}
+.kill-toggle input{position:absolute;opacity:0;width:0;height:0}
+.kill-toggle .toggle-track{width:36px;height:20px;background:var(--border);border-radius:10px;position:relative;transition:background .25s;flex-shrink:0}
+.kill-toggle .toggle-track::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:var(--text-muted);transition:all .25s}
+.kill-toggle input:checked+.toggle-track{background:var(--success);box-shadow:0 0 8px rgba(34,197,94,.3)}
+.kill-toggle input:checked+.toggle-track::after{left:19px;background:#fff}
+.kill-toggle .toggle-label{font-size:.72rem;font-weight:600;color:var(--text-muted);transition:color .25s}
+.kill-toggle input:checked~.toggle-label{color:var(--success)}
+.respawn-info{font-size:.68rem;color:var(--text-muted);display:block;margin-top:2px}
+.phase-badge{padding:2px 7px;border-radius:4px;font-size:.68rem;font-weight:700;background:rgba(139,92,246,.2);color:#a78bfa;margin-left:6px}
+.toast-container{position:fixed;top:16px;right:16px;z-index:999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--bg-card);border:1px solid var(--accent2);border-radius:10px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.4);display:flex;align-items:center;gap:8px;animation:slideIn .3s ease;min-width:260px}
+.toast.toast-success{border-color:var(--success)}
+.toast .toast-icon{font-size:1.2rem}
+.toast .toast-text{font-size:.82rem;font-weight:600}
+.toast .toast-sub{font-size:.72rem;color:var(--text-secondary)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-box{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:380px;width:90%;box-shadow:var(--shadow-lg);animation:scaleIn .2s ease}
+@keyframes scaleIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-box h3{font-size:1rem;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.modal-box p{font-size:.85rem;color:var(--text-secondary);margin-bottom:20px;line-height:1.5}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.btn-ghost{background:rgba(148,163,184,.1);color:var(--text-secondary);padding:8px 16px;border-radius:9px;border:1px solid var(--border)}
+.btn-ghost:hover{background:rgba(148,163,184,.2);color:var(--text-primary)}
+/* Mobile cards */
+.mobile-cards{display:none}
+.boss-card{background:var(--bg-input);border:1px solid var(--border);border-radius:12px;padding:14px;margin:8px 14px}
+.boss-card.alert-soon{border-color:var(--urgent);animation:pulseCard 1.5s ease-in-out infinite}
+.boss-card.just-reset{animation:flashGreen 1s ease}
+@keyframes pulseCard{0%,100%{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.03)}50%{border-color:var(--urgent);background:rgba(239,68,68,.08)}}
+.boss-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.boss-card-info h3{font-size:.95rem;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:5px}
+.boss-card-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.boss-card-meta span{font-size:.75rem;color:var(--text-secondary)}
+.boss-card-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid rgba(30,45,74,.5)}
+.boss-card-countdown{display:flex;flex-direction:column;gap:2px}
+.boss-card-countdown .countdown-label{font-size:.68rem;text-transform:uppercase;color:var(--text-muted);letter-spacing:.05em}
+.boss-card-time{font-size:.78rem;color:var(--text-secondary)}
+.boss-card-actions{display:flex;align-items:center;gap:6px}
+@media(max-width:768px){.form-row{grid-template-columns:1fr 1fr}.form-row-2{grid-template-columns:1fr auto auto}.header h1{font-size:1.6rem}.desktop-table{display:none!important}.mobile-cards{display:block}}
+@media(max-width:480px){.form-row{grid-template-columns:1fr}.form-row-2{grid-template-columns:1fr}.container{padding:14px 10px}.phase-btn{padding:8px 12px;font-size:.78rem}}
+@media(min-width:769px){.mobile-cards{display:none!important}}
+</style>
+</head>
+<body>
+<noscript><div style="background:#1e1e2e;color:#f59e0b;text-align:center;padding:40px;font-family:sans-serif;font-size:1.2rem">⚠️ กรุณาเปิด JavaScript เพื่อใช้งาน TOSM Boss Timer</div></noscript>
+<div class="container">
+<div class="header">
+<h1>⚔️ TOSM Boss Timer</h1>
+<p>Tree of Savior M — ระบบติดตามเวลาเกิดบอส</p>
+</div>
+
+<div class="form-card">
+<h2>➕ เพิ่มบอส</h2>
+
+<!-- Phase Section -->
+<div class="phase-section">
+<h3>🔥 เลือกเฟสบอส (ก่อนบอสเกิด)</h3>
+<div class="phase-grid">
+<button class="phase-btn active" data-phase="1" onclick="selectPhase(1)">
+เฟส 1
+<span class="phase-time">+20 นาที</span>
+</button>
+<button class="phase-btn" data-phase="2" onclick="selectPhase(2)">
+เฟส 2
+<span class="phase-time">+10 นาที</span>
+</button>
+<button class="phase-btn" data-phase="3" onclick="selectPhase(3)">
+เฟส 3
+<span class="phase-time">+5 นาที</span>
+</button>
+<button class="phase-btn" data-phase="4" onclick="selectPhase(4)">
+เฟส 4
+<span class="phase-time">+5 นาที</span>
+</button>
+</div>
+<div class="phase-result show" id="phaseResult">
+⏰ เลือก <strong id="phaseResultPhaseStr">เฟส 1</strong> (<span id="phaseResultMinsStr">+20</span> นาที) — บอสจะเกิดตอน <span class="time-big" id="phaseTimePreview">--:--</span>
+</div>
+</div>
+
+<hr class="divider"/>
+
+<!-- EP-based Boss Selection -->
+<div class="preset-section">
+<h3>📦 เลือกบอสตาม EP</h3>
+<div class="ep-tabs" id="epTabs"></div>
+<div class="preset-grid">
+<select id="bossPreset" onchange="applyPreset()">
+<option value="">— เลือก EP ก่อน —</option>
+</select>
+<select id="presetChannel" style="flex:0 0 auto; min-width:80px;" onchange="applyPreset()">
+<option value="1">CH 1</option><option value="2">CH 2</option><option value="3">CH 3</option><option value="4">CH 4</option><option value="5">CH 5</option>
+<option value="6">CH 6</option><option value="7">CH 7</option><option value="8">CH 8</option><option value="9">CH 9</option><option value="10">CH 10</option>
+</select>
+<button class="btn btn-preset" onclick="addPresetBoss()" title="เพิ่มบอสที่เลือก">📥 เพิ่มจาก EP</button>
+</div>
+<div class="preset-info" id="presetInfo"></div>
+</div>
+
+<hr class="divider"/>
+
+<h3 style="font-size:.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:12px">✏️ หรือกรอกเอง</h3>
+<div class="form-row">
+<div class="form-group">
+<label>ชื่อบอส</label>
+<input type="text" id="bossName" placeholder="เช่น Strong Fireload"/>
+</div>
+<div class="form-group">
+<label>ประเภทบอส</label>
+<select id="bossType" onchange="syncRespawnInput()">
+<option value="field">🟢 Field Boss</option>
+<option value="world" selected>🟡 World Boss</option>
+<option value="demon">🔴 Demon Lord</option>
+</select>
+</div>
+<div class="form-group">
+<label>MAP / แผนที่</label>
+<input type="text" id="bossMap" placeholder="เช่น EP 10 Area"/>
+</div>
+<div class="form-group">
+<label>CH</label>
+<select id="bossChannel">
+<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+<option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+</select>
+</div>
+</div>
+<div class="form-row-2">
+<div class="form-group">
+<label>เวลาเกิด (หรือใช้ปุ่มด้านขวา)</label>
+<input type="time" id="bossTime" step="1"/>
+</div>
+<div class="form-group">
+<label>Respawn (ชม.)</label>
+<input type="number" id="bossRespawnHours" value="4" min="0.5" max="72" step="0.5" style="width:70px"/>
+</div>
+<div class="form-group">
+<label>&nbsp;</label>
+<button class="btn btn-primary" onclick="addBoss()">✚ เพิ่ม</button>
+</div>
+<div class="form-group">
+<label>&nbsp;</label>
+<button class="btn btn-success" onclick="addBossWithPhase()" title="ตั้งเวลาเกิดตามเฟสที่เลือก">⚡ เพิ่มตามเฟส</button>
+</div>
+</div>
+<div class="hint-text">💡 <strong>⚡ เพิ่มตามเฟส</strong> = คำนวณเวลาเกิดจากเฟสที่เลือก (เฟส1 +20นาที, เฟส2 +10นาที, เฟส3-4 +5นาที)</div>
+<div class="settings-row">
+<label>🔔 แจ้งเตือนก่อน (นาที): <input type="number" id="alertMinutes" value="5" min="1" max="60"/></label>
+<button class="btn btn-sm btn-mute" id="muteBtn" onclick="toggleMute()">🔊 เปิดเสียง</button>
+</div>
+</div>
+
+<div class="table-card">
+<div class="table-header">
+<h2>📋 รายการบอส</h2>
+<div class="table-header-actions">
+<span class="badge badge-count" id="bossCount">0 รายการ</span>
+<button class="btn btn-outline-danger btn-sm" id="clearAllBtn" onclick="clearAllBosses()" style="display:none">🗑 ลบทั้งหมด</button>
+</div>
+</div>
+<div id="tableContainer">
+<div class="empty-state" id="emptyState">
+<div class="icon">🐉</div>
+<p>ยังไม่มีบอสในรายการ — เพิ่มบอสด้านบนเพื่อเริ่มต้น</p>
+</div>
+<table id="bossTable" class="desktop-table" style="display:none">
+<thead><tr>
+<th>สถานะ</th><th>ชื่อบอส</th><th>ประเภท</th><th>MAP / CH</th><th>เฟส</th><th>เวลาเกิด</th><th>นับถอยหลัง</th><th>บอสตาย</th><th>จัดการ</th>
+</tr></thead>
+<tbody id="bossTableBody"></tbody>
+</table>
+<div class="mobile-cards" id="mobileCards"></div>
+</div>
+</div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<div class="modal-overlay" id="confirmModal" style="display:none">
+<div class="modal-box">
+<h3 id="confirmTitle">⚠️ ยืนยัน</h3>
+<p id="confirmMessage">คุณต้องการลบรายการนี้หรือไม่?</p>
+<div class="modal-actions">
+<button class="btn btn-ghost" onclick="closeConfirm()">ยกเลิก</button>
+<button class="btn btn-danger" id="confirmActionBtn">ยืนยัน</button>
+</div>
+</div>
+</div>
+
+<script>
+const DEFAULT_RESPAWN={field:2,world:4,demon:8};
+const TYPE_LABELS={field:"Field Boss",world:"World Boss",demon:"Demon Lord"};
+const TYPE_CSS={field:"type-field",world:"type-world",demon:"type-demon"};
+
+// ===== Phase Configuration =====
+const PHASE_MINUTES={1:20, 2:10, 3:5, 4:5};
+let currentPhase=1;
+
+// ===== EP-based Boss Database =====
+const EP_BOSSES={
+  "EP 2":[
+    {name:"Cowardly Cyclops",type:"world"},
+    {name:"Strong Nepenthes",type:"world"},
+    {name:"Strong Malletwyvern",type:"world"},
+    {name:"Strong Throneweaver",type:"world"},
+    {name:"Strong Necrovanter",type:"world"}
+  ],
+  "EP 3":[
+    {name:"Strong Iltiswort",type:"world"},
+    {name:"Cowardly Mummygust",type:"world"},
+    {name:"Strong Velniamonkey",type:"world"},
+    {name:"Indignant Deathweaver",type:"world"}
+  ],
+  "EP 4":[
+    {name:"Cowardly Clymen",type:"world"},
+    {name:"Strong Mothtem",type:"world"},
+    {name:"Indignant Hydra",type:"world"},
+    {name:"Strong Tutu",type:"world"}
+  ],
+  "EP 5":[
+    {name:"Strong Grinender",type:"world"},
+    {name:"Cowardly Reaverpede",type:"world"},
+    {name:"Indignant Red Rambandgad",type:"world"}
+  ],
+  "EP 6":[
+    {name:"Strong Archon",type:"world"},
+    {name:"Strong Chafer",type:"world"},
+    {name:"Cowardly Manticen",type:"world"},
+    {name:"Indignant Bramble",type:"world"},
+    {name:"Strong Taumas",type:"world"}
+  ],
+  "EP 7":[
+    {name:"Strong Gorkas",type:"world"},
+    {name:"Strong Thumlord",type:"world"},
+    {name:"Angry Rexipher",type:"world"},
+    {name:"Cowardly Vearkaras",type:"world"}
+  ],
+  "EP 8":[
+    {name:"Strong Dionysus",type:"world"},
+    {name:"Angry Demon Lord Hauberk",type:"world"},
+    {name:"Cowardly Nuaele",type:"world"},
+    {name:"Strong Blood",type:"world"},
+    {name:"Strong Corrupted",type:"world"},
+    {name:"Cowardly Scorpio",type:"world"}
+  ],
+  "EP 9":[
+    {name:"Strong Chapparition",type:"world"},
+    {name:"Strong Salamander",type:"world"},
+    {name:"Cowardly Devilglove",type:"world"},
+    {name:"Strong Mineloader",type:"world"},
+    {name:"Indignant Helga Sircle",type:"world"}
+  ],
+  "EP 10":[
+    {name:"Strong Fireload",type:"world"},
+    {name:"Strong Riteris",type:"world"},
+    {name:"Cowardly Glackuman",type:"world"},
+    {name:"Indignant Naktis",type:"world"}
+  ]
+};
+
+let currentEP=null;
+let bosses=[];
+try{bosses=JSON.parse(localStorage.getItem("tosmBossTimers")||"[]");if(!Array.isArray(bosses))bosses=[];}catch(e){console.warn("Failed to parse saved bosses, resetting.",e);bosses=[];}
+const _nowInit = Date.now();
+bosses.forEach(b=>{
+  if(!b.customRespawn) b.customRespawn=DEFAULT_RESPAWN[b.type]||4;
+  if(!b.timestamp) {
+    if(b.time) {
+      const p = b.time.split(":");
+      const target = new Date(_nowInit);
+      target.setHours(+p[0], +p[1], p[2]?+p[2]:0, 0);
+      let ts = target.getTime();
+      if(ts < _nowInit - 43200000) ts += 86400000;
+      else if(ts > _nowInit + 43200000 && b.customRespawn <= 12) ts -= 86400000; 
+      b.timestamp = ts;
+    } else {
+      b.timestamp = _nowInit;
+    }
+  }
+});
+let muted=false;
+try{muted=JSON.parse(localStorage.getItem("tosmBossMuted")||"false");}catch(e){muted=false;}
+let alertedSet=new Set();
+let recentlyReset=new Set();
+let audioCtx=null;
+let confirmCallback=null;
+let editingRespawnId=null;
+function generateId(){try{return crypto.randomUUID();}catch(e){return Date.now().toString(36)+Math.random().toString(36).substr(2,9)+Math.random().toString(36).substr(2,5);}}
+
+function getAudioCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume().catch(()=>{});return audioCtx}
+function playAlertSound(){if(muted)return;try{const c=getAudioCtx();[523.25,659.25,783.99].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.setValueAtTime(f,c.currentTime+i*.15);g.gain.setValueAtTime(.3,c.currentTime+i*.15);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+i*.15+.4);o.connect(g);g.connect(c.destination);o.start(c.currentTime+i*.15);o.stop(c.currentTime+i*.15+.4)})}catch(e){}}
+function toggleMute(){muted=!muted;localStorage.setItem("tosmBossMuted",JSON.stringify(muted));document.getElementById("muteBtn").textContent=muted?"🔇 ปิดเสียง":"🔊 เปิดเสียง";if(!muted)getAudioCtx()}
+function pad(n){return n.toString().padStart(2,"0")}
+function addMinutesToNow(m){const d=new Date();d.setTime(d.getTime()+m*60000);return pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds())}
+function addHoursToNow(h){return addMinutesToNow(h*60)}
+function getTimeDiffSeconds(b,nowObj){if(b.timestamp)return(b.timestamp-nowObj.getTime())/1000;if(!b.time)return 0;const p=b.time.split(":");const target=new Date(nowObj);target.setHours(+p[0],+p[1],p[2]?+p[2]:0,0);return(target-nowObj)/1e3}
+function formatCountdown(s){if(s<=0){const a=Math.abs(Math.floor(s)),h=Math.floor(a/3600),m=Math.floor(a%3600/60),sec=a%60;return h>0?`ผ่านมา ${h}ชม ${pad(m)}น ${pad(sec)}วิ`:m>0?`ผ่านมา ${m}น ${pad(sec)}วิ`:`ผ่านมา ${sec}วิ`}const h=Math.floor(s/3600),m=Math.floor(s%3600/60),sec=Math.floor(s%60);return h>0?`${h}:${pad(m)}:${pad(sec)}`:`${m}:${pad(sec)}`}
+function escapeHtml(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML}
+
+// ===== Phase Functions =====
+function selectPhase(phase){
+  currentPhase=phase;
+  document.querySelectorAll(".phase-btn").forEach(btn=>{
+    btn.classList.toggle("active",parseInt(btn.dataset.phase)===phase);
+  });
+  updatePhasePreview();
+}
+
+function updatePhasePreview(){
+  const mins=PHASE_MINUTES[currentPhase];
+  const spawnTime=addMinutesToNow(mins);
+  const phaseStr=document.getElementById("phaseResultPhaseStr");
+  const minsStr=document.getElementById("phaseResultMinsStr");
+  const preview=document.getElementById("phaseTimePreview");
+  if(phaseStr && minsStr && preview){
+    if (phaseStr.textContent !== `เฟส ${currentPhase}`) {
+      phaseStr.textContent=`เฟส ${currentPhase}`;
+      minsStr.textContent=`+${mins}`;
+    }
+    preview.textContent=spawnTime;
+  }
+}
+
+// ===== EP Tab Functions =====
+function initEPTabs(){
+  const container=document.getElementById("epTabs");
+  container.innerHTML="";
+  Object.keys(EP_BOSSES).forEach(ep=>{
+    const btn=document.createElement("button");
+    btn.className="ep-tab";
+    btn.textContent=ep;
+    btn.onclick=()=>selectEP(ep);
+    container.appendChild(btn);
+  });
+}
+
+function selectEP(ep){
+  currentEP=ep;
+  document.querySelectorAll(".ep-tab").forEach(tab=>{
+    tab.classList.toggle("active",tab.textContent===ep);
+  });
+  const select=document.getElementById("bossPreset");
+  const bossList=EP_BOSSES[ep]||[];
+  select.innerHTML=`<option value="">— เลือกบอสจาก ${ep} —</option>`;
+  bossList.forEach((b,i)=>{
+    const typeEmoji={field:"🟢",world:"🟡",demon:"🔴"};
+    const opt=document.createElement("option");
+    opt.value=ep+"_"+i;
+    opt.textContent=`${typeEmoji[b.type]||"🟡"} ${b.name}`;
+    select.appendChild(opt);
+  });
+  document.getElementById("presetInfo").classList.remove("show");
+}
+
+// ===== Preset Functions =====
+function applyPreset(){
+  const sel=document.getElementById("bossPreset").value;
+  const info=document.getElementById("presetInfo");
+  if(!sel){info.classList.remove("show");return}
+  const parts=sel.split("_");
+  const epKey=parts.slice(0,-1).join("_").replaceAll("_"," ");
+  const idx=parseInt(parts[parts.length-1]);
+  const epBosses=EP_BOSSES[epKey];
+  if(!epBosses||!epBosses[idx]){info.classList.remove("show");return}
+  const p=epBosses[idx];
+  // Fill form
+  document.getElementById("bossName").value=p.name;
+  document.getElementById("bossType").value=p.type;
+  document.getElementById("bossMap").value=epKey;
+  syncRespawnInput();
+  // Show info
+  const typeEmoji={field:"🟢",world:"🟡",demon:"🔴"};
+  const mins=PHASE_MINUTES[currentPhase];
+  const spawnTime=addMinutesToNow(mins);
+  const ch=document.getElementById("presetChannel").value||"1";
+  info.innerHTML=`${typeEmoji[p.type]||""} <strong>${p.name}</strong> | ${TYPE_LABELS[p.type]} | 📍 ${epKey} (CH ${ch}) | 🔥 เฟส ${currentPhase} (+${mins} นาที) → เกิดตอน <strong>${spawnTime}</strong>`;
+  info.classList.add("show");
+}
+
+function addPresetBoss(){
+  const sel=document.getElementById("bossPreset").value;
+  if(!sel){showToast("⚠️","กรุณาเลือกบอสจาก EP","");return}
+  const parts=sel.split("_");
+  const epKey=parts.slice(0,-1).join("_").replace("_"," ");
+  const idx=parseInt(parts[parts.length-1]);
+  const epBosses=EP_BOSSES[epKey];
+  if(!epBosses||!epBosses[idx])return;
+  const p=epBosses[idx];
+  const mins=PHASE_MINUTES[currentPhase];
+  const time=addMinutesToNow(mins);
+  const spawnTimestamp = Date.now() + mins * 60000;
+  const ch=document.getElementById("presetChannel").value||"1";
+  bosses.push({
+    id:generateId(),
+    name:p.name,type:p.type,map:epKey,time,timestamp:spawnTimestamp,
+    customRespawn:DEFAULT_RESPAWN[p.type]||4,
+    phase:currentPhase,ep:epKey,channel:ch
+  });
+  saveBosses();renderTable();
+  showToast("📥",`เพิ่ม ${p.name}`,`${epKey} (CH ${ch}) | เฟส ${currentPhase} (+${mins} นาที) → เกิดตอน ${time}`,true);
+  document.getElementById("bossPreset").value="";
+  document.getElementById("presetInfo").classList.remove("show");
+  if(!muted)getAudioCtx();
+}
+
+function syncRespawnInput(){const t=document.getElementById("bossType").value;document.getElementById("bossRespawnHours").value=DEFAULT_RESPAWN[t]||4}
+function getRespawnHours(){return parseFloat(document.getElementById("bossRespawnHours").value)||4}
+
+function addBoss(){
+  const n=document.getElementById("bossName"),t=document.getElementById("bossType"),m=document.getElementById("bossMap"),ti=document.getElementById("bossTime");
+  const ch=document.getElementById("bossChannel").value||"1";
+  if(!n.value.trim()||!m.value.trim()||!ti.value){showToast("⚠️","กรุณากรอกข้อมูลให้ครบ","");return}
+  const respawn=getRespawnHours();
+  const rawTime = ti.value;
+  const p = rawTime.split(":");
+  const target = new Date();
+  target.setHours(+p[0], +p[1], 0, 0);
+  let ts = target.getTime();
+  if(ts < Date.now() - 43200000) ts += 86400000;
+  bosses.push({id:generateId(),name:n.value.trim(),type:t.value,map:m.value.trim(),time:rawTime+":00",timestamp:ts,customRespawn:respawn,phase:null,ep:m.value.trim(),channel:ch});
+  saveBosses();renderTable();showToast("✅",`เพิ่ม ${n.value.trim()} แล้ว`,`เวลาเกิด ${rawTime} (CH ${ch})`,true);
+  n.value="";m.value="";ti.value="";n.focus();if(!muted)getAudioCtx();
+}
+
+function addBossWithPhase(){
+  const n=document.getElementById("bossName"),t=document.getElementById("bossType"),m=document.getElementById("bossMap");
+  const ch=document.getElementById("bossChannel").value||"1";
+  if(!n.value.trim()||!m.value.trim()){showToast("⚠️","กรอก ชื่อบอส และ MAP ก่อน","เวลาจะคำนวณจากเฟสที่เลือก");return}
+  const mins=PHASE_MINUTES[currentPhase];
+  const time=addMinutesToNow(mins);
+  const ts = Date.now() + mins * 60000;
+  const respawn=getRespawnHours();
+  bosses.push({id:generateId(),name:n.value.trim(),type:t.value,map:m.value.trim(),time,timestamp:ts,customRespawn:respawn,phase:currentPhase,ep:m.value.trim(),channel:ch});
+  saveBosses();renderTable();showToast("⚡",`เพิ่ม ${n.value.trim()}`,`เฟส ${currentPhase} (+${mins} นาที) → เกิดตอน ${time} (CH ${ch})`,true);
+  n.value="";m.value="";document.getElementById("bossTime").value="";n.focus();if(!muted)getAudioCtx();
+}
+
+function markBossKilled(id){
+  const b=bosses.find(x=>x.id===id);if(!b)return;
+  const hours=b.customRespawn||DEFAULT_RESPAWN[b.type]||4;
+  b.time=addHoursToNow(hours);
+  b.timestamp=Date.now() + hours * 3600000;
+  alertedSet.delete(id);recentlyReset.add(id);saveBosses();renderTable();
+  showToast("💀",`${b.name} ตายแล้ว!`,`เกิดใหม่อีก ${hours} ชม. (${b.time})`,true);
+  setTimeout(()=>recentlyReset.delete(id),1200);
+}
+
+function startEditRespawn(id){editingRespawnId=id;renderTable()}
+function saveRespawn(id){
+  const inp=document.getElementById("rs-edit-"+id);if(!inp)return;
+  const v=parseFloat(inp.value);if(!v||v<=0){showToast("⚠️","กรุณาใส่ค่าที่ถูกต้อง","");return}
+  const b=bosses.find(x=>x.id===id);if(b){b.customRespawn=v;saveBosses();showToast("✅",`Respawn ${b.name} → ${v} ชม.`,"",true)}
+  editingRespawnId=null;renderTable();
+}
+function cancelEditRespawn(){editingRespawnId=null;renderTable()}
+
+function deleteBoss(id){const b=bosses.find(x=>x.id===id);showConfirm("🗑 ลบบอส",`ลบ "${b?b.name:"บอส"}" ?`,()=>{bosses=bosses.filter(x=>x.id!==id);alertedSet.delete(id);saveBosses();renderTable()})}
+function clearAllBosses(){if(!bosses.length)return;showConfirm("⚠️ ลบทั้งหมด",`ลบบอสทั้งหมด ${bosses.length} รายการ?`,()=>{bosses=[];alertedSet.clear();saveBosses();renderTable()})}
+function saveBosses(){try{localStorage.setItem("tosmBossTimers",JSON.stringify(bosses))}catch(e){console.error("Failed to save bosses:",e);showToast("⚠️","บันทึกข้อมูลไม่ได้","localStorage เต็มหรือถูกบล็อก")}}
+
+function showConfirm(title,msg,cb){document.getElementById("confirmTitle").textContent=title;document.getElementById("confirmMessage").textContent=msg;confirmCallback=cb;document.getElementById("confirmModal").style.display="flex"}
+function closeConfirm(){document.getElementById("confirmModal").style.display="none";confirmCallback=null}
+document.getElementById("confirmActionBtn").addEventListener("click",()=>{if(confirmCallback)confirmCallback();closeConfirm()});
+document.getElementById("confirmModal").addEventListener("click",e=>{if(e.target.id==="confirmModal")closeConfirm()});
+
+function renderTable(){
+  const tbody=document.getElementById("bossTableBody"),table=document.getElementById("bossTable"),empty=document.getElementById("emptyState"),countEl=document.getElementById("bossCount"),clearBtn=document.getElementById("clearAllBtn"),mc=document.getElementById("mobileCards");
+  countEl.textContent=`${bosses.length} รายการ`;clearBtn.style.display=bosses.length?"inline-flex":"none";
+  if(!bosses.length){table.style.display="none";empty.style.display="block";mc.innerHTML="";return}
+  table.style.display="table";empty.style.display="none";
+  const now=new Date(),sorted=[...bosses].sort((a,b)=>getTimeDiffSeconds(a,now)-getTimeDiffSeconds(b,now));
+  const alertMins=parseInt(document.getElementById("alertMinutes").value,10)||5,alertSecs=alertMins*60;
+
+  tbody.innerHTML=sorted.map(b=>{
+    const diff=getTimeDiffSeconds(b,now);let sd="active",cc="safe",ac="";
+    if(diff<=0){sd="passed";cc="passed"}else if(diff<=60){sd="imminent";cc="urgent";ac="alert-soon"}else if(diff<=alertSecs){sd="soon";cc="warning";ac="alert-soon"}
+    if(recentlyReset.has(b.id))ac="just-reset";
+    const hours=b.customRespawn||DEFAULT_RESPAWN[b.type]||4;
+    const isEditing=editingRespawnId===b.id;
+    const respawnCell=isEditing
+    ?`<span class="respawn-edit-wrap"><input type="number" id="rs-edit-${b.id}" class="respawn-input-inline" value="${hours}" min="0.5" max="72" step="0.5" onkeydown="if(event.key==='Enter')saveRespawn('${b.id}');if(event.key==='Escape')cancelEditRespawn()"/><button class="btn-save-rs" onclick="saveRespawn('${b.id}')">✓</button></span>`
+    :`<span class="respawn-edit-wrap"><span style="font-size:.78rem;color:var(--accent);font-weight:700">${hours} ชม.</span><button class="btn-edit" onclick="startEditRespawn('${b.id}')" title="แก้ไขเวลา Respawn">✏️</button></span>`;
+    const phaseLabel=b.phase?`<span class="phase-badge">เฟส ${b.phase}</span>`:"";
+    const epLabel=b.ep||b.map||"";
+    const chLabel=b.channel?`<br/><span style="color:var(--text-muted);font-weight:600;font-size:0.75rem;">CH ${b.channel}</span>`:"";
+    return`<tr class="${ac}" data-id="${b.id}">
+    <td><span class="status-dot ${sd}"></span></td>
+    <td class="map-name">${escapeHtml(b.name)}${phaseLabel}</td>
+    <td><span class="type-badge ${TYPE_CSS[b.type]||"type-world"}">${TYPE_LABELS[b.type]||b.type}</span></td>
+    <td style="font-size:.78rem;line-height:1.4">${escapeHtml(epLabel)}${chLabel}</td>
+    <td style="font-size:.75rem;color:var(--text-secondary)">${b.phase?"เฟส "+b.phase:"-"}</td>
+    <td class="time-display">${b.time}</td>
+    <td><span class="countdown ${cc}">${formatCountdown(diff)}</span></td>
+    <td><label class="kill-toggle" title="ติ๊กเมื่อบอสตาย → รีเซ็ตเวลา +${hours} ชม."><input type="checkbox" onchange="markBossKilled('${b.id}')"/><span class="toggle-track"></span><span class="toggle-label">ตายแล้ว</span></label><span class="respawn-info">Respawn: ${respawnCell}</span></td>
+    <td><div class="actions-cell"><button class="btn btn-sm btn-danger" onclick="deleteBoss('${b.id}')">✕</button></div></td></tr>`}).join("");
+
+  mc.innerHTML=sorted.map(b=>{
+    const diff=getTimeDiffSeconds(b,now);let cc="safe",ac="",sd="active";
+    if(diff<=0){cc="passed";sd="passed"}else if(diff<=60){cc="urgent";ac="alert-soon";sd="imminent"}else if(diff<=alertSecs){cc="warning";ac="alert-soon";sd="soon"}
+    if(recentlyReset.has(b.id))ac="just-reset";
+    const hours=b.customRespawn||DEFAULT_RESPAWN[b.type]||4;
+    const isEditing=editingRespawnId===b.id;
+    const mobileRespawn=isEditing
+    ?`<span class="respawn-edit-wrap"><input type="number" id="rs-edit-${b.id}" class="respawn-input-inline" value="${hours}" min="0.5" max="72" step="0.5" onkeydown="if(event.key==='Enter')saveRespawn('${b.id}');if(event.key==='Escape')cancelEditRespawn()"/><button class="btn-save-rs" onclick="saveRespawn('${b.id}')">✓</button></span>`
+    :`<span class="respawn-edit-wrap"><span>${hours}ชม.</span><button class="btn-edit" onclick="startEditRespawn('${b.id}')" title="แก้ไข">✏️</button></span>`;
+    const phaseLabel=b.phase?`<span class="phase-badge">เฟส ${b.phase}</span>`:"";
+    const epLabel=b.ep||b.map||"";
+    const chLabel=b.channel?` | CH ${b.channel}`:"";
+    return`<div class="boss-card ${ac}" data-id="${b.id}"><div class="boss-card-top"><div class="boss-card-info"><h3><span class="status-dot ${sd}"></span>${escapeHtml(b.name)}${phaseLabel}</h3><div class="boss-card-meta"><span class="type-badge ${TYPE_CSS[b.type]||"type-world"}">${TYPE_LABELS[b.type]||b.type}</span>${epLabel?`<span>📍 ${escapeHtml(epLabel)}${chLabel}</span>`:""}</div></div><button class="btn btn-sm btn-danger" onclick="deleteBoss('${b.id}')">✕</button></div><div class="boss-card-bottom"><div class="boss-card-countdown"><span class="countdown-label">นับถอยหลัง</span><span class="countdown ${cc}">${formatCountdown(diff)}</span><span class="boss-card-time">🕐 ${b.time} | Respawn ${mobileRespawn}</span></div><div class="boss-card-actions"><label class="kill-toggle"><input type="checkbox" onchange="markBossKilled('${b.id}')"/><span class="toggle-track"></span><span class="toggle-label">ตายแล้ว</span></label></div></div></div>`}).join("")}
+
+function updateTimers() {
+  const now = new Date();
+  const alertMins = parseInt(document.getElementById("alertMinutes").value, 10) || 5;
+  const alertSecs = alertMins * 60;
+  
+  document.querySelectorAll("#bossTableBody tr[data-id]").forEach(tr => {
+    const id = tr.getAttribute("data-id");
+    const b = bosses.find(x => x.id === id);
+    if (!b) return;
+    const diff = getTimeDiffSeconds(b, now);
+    let sd = "active", cc = "safe", ac = "";
+    if(diff <= 0){sd="passed";cc="passed"}else if(diff <= 60){sd="imminent";cc="urgent";ac="alert-soon"}else if(diff <= alertSecs){sd="soon";cc="warning";ac="alert-soon"}
+    if(recentlyReset.has(b.id)) ac="just-reset";
+    tr.className = ac;
+    const dot = tr.querySelector(".status-dot");
+    if(dot) dot.className = `status-dot ${sd}`;
+    const cd = tr.querySelector(".countdown");
+    if(cd) { cd.className = `countdown ${cc}`; cd.textContent = formatCountdown(diff); }
+  });
+  
+  document.querySelectorAll("#mobileCards .boss-card[data-id]").forEach(card => {
+    const id = card.getAttribute("data-id");
+    const b = bosses.find(x => x.id === id);
+    if (!b) return;
+    const diff = getTimeDiffSeconds(b, now);
+    let sd = "active", cc = "safe", ac = "";
+    if(diff <= 0){sd="passed";cc="passed"}else if(diff <= 60){sd="imminent";cc="urgent";ac="alert-soon"}else if(diff <= alertSecs){sd="soon";cc="warning";ac="alert-soon"}
+    if(recentlyReset.has(b.id)) ac="just-reset";
+    card.className = `boss-card ${ac}`;
+    const dot = card.querySelector(".status-dot");
+    if(dot) dot.className = `status-dot ${sd}`;
+    const cd = card.querySelector(".countdown");
+    if(cd) { cd.className = `countdown ${cc}`; cd.textContent = formatCountdown(diff); }
+  });
+}
+
+function showToast(icon,text,sub,ok){const c=document.getElementById("toastContainer"),t=document.createElement("div");t.className="toast"+(ok?" toast-success":"");t.innerHTML=`<span class="toast-icon">${escapeHtml(icon)}</span><div><div class="toast-text">${escapeHtml(text)}</div>${sub?`<div class="toast-sub">${escapeHtml(sub)}</div>`:""}</div>`;c.appendChild(t);setTimeout(()=>{t.style.animation="slideOut .3s ease forwards";setTimeout(()=>t.remove(),300)},4e3)}
+
+function checkAlerts(){const now=new Date(),am=parseInt(document.getElementById("alertMinutes").value,10)||5,as=am*60;
+const activeBossIds=new Set(bosses.map(b=>b.id));alertedSet.forEach(id=>{if(!activeBossIds.has(id))alertedSet.delete(id)});
+bosses.forEach(b=>{const d=getTimeDiffSeconds(b,now);if(d>0&&d<=as&&!alertedSet.has(b.id)){alertedSet.add(b.id);playAlertSound();showToast("🐲",`${b.name} กำลังจะเกิด!`,`${b.map} — เหลือ ${Math.ceil(d/60)} นาที`);try{if("Notification"in window&&Notification.permission==="granted")new Notification(`⚔️ ${b.name} กำลังจะเกิด!`,{body:`${TYPE_LABELS[b.type]} | ${b.map}\nเหลือ ${Math.ceil(d/60)} นาที`})}catch(e){}}if(d<-300)alertedSet.delete(b.id)})}
+
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&["bossName","bossMap","bossTime"].includes(e.target.id))addBoss()});
+document.getElementById("muteBtn").textContent=muted?"🔇 ปิดเสียง":"🔊 เปิดเสียง";
+
+// Initialize
+initEPTabs();
+updatePhasePreview();
+renderTable();
+if("Notification"in window&&Notification.permission==="default"){try{Notification.requestPermission()}catch(e){}}
+setInterval(()=>{updateTimers();checkAlerts();updatePhasePreview()},1e3);
+</script>
+</body>
+</html>
