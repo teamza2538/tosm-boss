@@ -54,18 +54,34 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellips
 .btn-edit:hover{background:rgba(245,158,11,.25)}
 .btn-save-rs{background:var(--success);color:#fff;padding:4px 7px;font-size:.72rem;border-radius:6px;border:none;cursor:pointer;font-family:"Inter",sans-serif}
 .hint-text{font-size:.75rem;color:var(--text-muted);margin-top:10px;display:flex;align-items:center;gap:5px}
-.preset-section{margin-bottom:16px}
-.preset-section h3{font-size:.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.preset-grid{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
-.preset-grid select{background:var(--bg-input);border:1px solid var(--border);border-radius:9px;padding:10px 12px;color:var(--text-primary);font-family:"Inter",sans-serif;font-size:.85rem;outline:none;transition:border-color .2s;flex:1;min-width:140px;cursor:pointer}
-.preset-grid select:focus{border-color:var(--accent)}
-.preset-grid select option{background:var(--bg-card);color:var(--text-primary)}
-.preset-grid select optgroup{color:var(--accent);font-weight:700;font-style:normal}
-.btn-preset{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 4px 12px rgba(99,102,241,.25)}
-.btn-preset:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(99,102,241,.35)}
-.preset-info{font-size:.72rem;color:var(--text-muted);margin-top:8px;padding:8px 12px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);border-radius:8px;display:none;line-height:1.6}
-.preset-info.show{display:block}
-.preset-info strong{color:var(--text-secondary)}
+/* Quick Input styles */
+.quick-input-section{margin-bottom:20px;padding:18px;background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(139,92,246,.06));border:1.5px solid rgba(99,102,241,.25);border-radius:12px;position:relative;overflow:hidden}
+.quick-input-section::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#6366f1,#8b5cf6,#f59e0b);opacity:.6}
+.quick-input-section h3{font-size:.9rem;font-weight:700;color:#a78bfa;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.quick-input-row{display:flex;gap:10px;align-items:stretch}
+.quick-input-wrap{flex:1;position:relative}
+.quick-input-wrap input{width:100%;background:var(--bg-input);border:2px solid var(--border);border-radius:10px;padding:14px 16px 14px 44px;color:var(--text-primary);font-family:"Inter",monospace;font-size:1.15rem;font-weight:700;letter-spacing:.08em;outline:none;transition:all .25s}
+.quick-input-wrap input:focus{border-color:#8b5cf6;box-shadow:0 0 16px rgba(139,92,246,.2)}
+.quick-input-wrap input::placeholder{color:var(--text-muted);font-weight:400;font-size:.9rem;letter-spacing:0}
+.quick-input-wrap .input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.1rem;pointer-events:none}
+.quick-input-preview{margin-top:10px;display:none;animation:fadeIn .2s ease}
+.quick-input-preview.show{display:block}
+.quick-preview-card{display:flex;gap:12px;align-items:center;padding:10px 14px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:9px;flex-wrap:wrap}
+.quick-preview-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;font-size:.78rem;font-weight:600;background:rgba(99,102,241,.12);color:#a78bfa}
+.quick-preview-tag.map-tag{background:rgba(34,197,94,.12);color:#4ade80}
+.quick-preview-tag.ch-tag{background:rgba(245,158,11,.12);color:#fbbf24}
+.quick-preview-tag.phase-tag{background:rgba(239,68,68,.12);color:#f87171}
+.quick-preview-tag.time-tag{background:rgba(34,197,94,.15);color:#4ade80;font-weight:800;font-size:.85rem}
+.quick-preview-boss{margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.quick-preview-boss select{background:var(--bg-input);border:1px solid rgba(139,92,246,.3);border-radius:8px;padding:7px 10px;color:var(--text-primary);font-family:"Inter",sans-serif;font-size:.82rem;outline:none;cursor:pointer;min-width:180px;transition:border-color .2s}
+.quick-preview-boss select:focus{border-color:#8b5cf6}
+.quick-preview-boss select option{background:var(--bg-card)}
+.quick-format-hint{display:flex;gap:12px;margin-top:8px;align-items:center;flex-wrap:wrap}
+.quick-format-hint span{font-size:.72rem;color:var(--text-muted)}
+.quick-format-hint code{background:rgba(139,92,246,.12);color:#c4b5fd;padding:2px 6px;border-radius:4px;font-size:.72rem;font-family:"Inter",monospace;font-weight:600}
+.btn-quick-add{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;padding:14px 24px;font-size:.9rem;font-weight:700;border-radius:10px;box-shadow:0 4px 16px rgba(99,102,241,.3);white-space:nowrap}
+.btn-quick-add:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(99,102,241,.4)}
+.btn-quick-add:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
 
 /* Phase selector styles */
 .phase-section{margin-bottom:16px}
@@ -79,12 +95,6 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellips
 .phase-result{display:none;margin-top:10px;padding:10px 14px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:9px;font-size:.82rem;color:var(--success);font-weight:600;animation:fadeIn .3s ease}
 .phase-result.show{display:flex;align-items:center;gap:8px}
 .phase-result .time-big{font-size:1.1rem;font-weight:800;color:#4ade80}
-
-/* EP Tab styles */
-.ep-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.ep-tab{padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg-input);color:var(--text-muted);font-family:"Inter",sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s}
-.ep-tab:hover{border-color:var(--accent);color:var(--text-primary)}
-.ep-tab.active{background:rgba(245,158,11,.12);border-color:var(--accent);color:var(--accent);box-shadow:0 0 8px rgba(245,158,11,.1)}
 
 .divider{border:none;border-top:1px solid var(--border);margin:16px 0}
 .table-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-lg)}
@@ -162,8 +172,8 @@ tbody tr.just-reset{animation:flashGreen 1s ease}
 .boss-card-countdown .countdown-label{font-size:.68rem;text-transform:uppercase;color:var(--text-muted);letter-spacing:.05em}
 .boss-card-time{font-size:.78rem;color:var(--text-secondary)}
 .boss-card-actions{display:flex;align-items:center;gap:6px}
-@media(max-width:768px){.form-row{grid-template-columns:1fr 1fr}.form-row-2{grid-template-columns:1fr auto auto}.header h1{font-size:1.6rem}.desktop-table{display:none!important}.mobile-cards{display:block}}
-@media(max-width:480px){.form-row{grid-template-columns:1fr}.form-row-2{grid-template-columns:1fr}.container{padding:14px 10px}.phase-btn{padding:8px 12px;font-size:.78rem}}
+@media(max-width:768px){.form-row{grid-template-columns:1fr 1fr}.form-row-2{grid-template-columns:1fr auto auto}.header h1{font-size:1.6rem}.desktop-table{display:none!important}.mobile-cards{display:block}.quick-input-row{flex-direction:column}.btn-quick-add{width:100%}}
+@media(max-width:480px){.form-row{grid-template-columns:1fr}.form-row-2{grid-template-columns:1fr}.container{padding:14px 10px}.phase-btn{padding:8px 12px;font-size:.78rem}.quick-input-wrap input{font-size:1rem;padding:12px 12px 12px 40px}}
 @media(min-width:769px){.mobile-cards{display:none!important}}
 .room-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;flex-wrap:wrap}
 .room-bar label{font-size:.8rem;color:var(--text-secondary);font-weight:600;display:flex;align-items:center;gap:5px}
@@ -197,6 +207,40 @@ tbody tr.just-reset{animation:flashGreen 1s ease}
 <div class="form-card">
 <h2>➕ เพิ่มบอส</h2>
 
+<!-- Quick Input Section -->
+<div class="quick-input-section">
+<h3>⚡ Quick Add — พิมพ์แจ้งบอสเร็ว</h3>
+<div class="quick-input-row">
+<div class="quick-input-wrap">
+<span class="input-icon">📍</span>
+<input type="text" id="quickInput" placeholder="103/1/3 = Map 103, CH 1, Phase 3" autocomplete="off" oninput="parseQuickInput()" onkeydown="if(event.key==='Enter')quickAddBoss()"/>
+</div>
+<button class="btn btn-quick-add" id="quickAddBtn" onclick="quickAddBoss()" disabled>📥 เพิ่มบอส</button>
+</div>
+<div class="quick-format-hint">
+<span>รูปแบบ:</span>
+<code>MAP/CH/PHASE</code>
+<span>เช่น</span>
+<code>103/1/3</code>
+<span>= Map 103, CH 1, เฟส 3 (+5 นาที)</span>
+</div>
+<div class="quick-input-preview" id="quickPreview">
+<div class="quick-preview-card">
+<span class="quick-preview-tag map-tag" id="qpMap">📍 Map ---</span>
+<span class="quick-preview-tag ch-tag" id="qpCh">📺 CH ---</span>
+<span class="quick-preview-tag phase-tag" id="qpPhase">🔥 เฟส ---</span>
+<span class="quick-preview-tag time-tag" id="qpTime">⏰ --:--:--</span>
+</div>
+<div class="quick-preview-boss" id="qpBossWrap">
+<select id="quickBossSelect" onchange="updateQuickPreviewBoss()">
+<option value="">— เลือกบอส —</option>
+</select>
+</div>
+</div>
+</div>
+
+<hr class="divider"/>
+
 <!-- Phase Section -->
 <div class="phase-section">
 <h3>🔥 เลือกเฟสบอส (ก่อนบอสเกิด)</h3>
@@ -225,25 +269,6 @@ tbody tr.just-reset{animation:flashGreen 1s ease}
 
 <hr class="divider"/>
 
-<!-- EP-based Boss Selection -->
-<div class="preset-section">
-<h3>📦 เลือกบอสตาม EP</h3>
-<div class="ep-tabs" id="epTabs"></div>
-<div class="preset-grid">
-<select id="bossPreset" onchange="applyPreset()">
-<option value="">— เลือก EP ก่อน —</option>
-</select>
-<select id="presetChannel" style="flex:0 0 auto; min-width:80px;" onchange="applyPreset()">
-<option value="1">CH 1</option><option value="2">CH 2</option><option value="3">CH 3</option><option value="4">CH 4</option><option value="5">CH 5</option>
-<option value="6">CH 6</option><option value="7">CH 7</option><option value="8">CH 8</option><option value="9">CH 9</option><option value="10">CH 10</option>
-</select>
-<button class="btn btn-preset" onclick="addPresetBoss()" title="เพิ่มบอสที่เลือก">📥 เพิ่มจาก EP</button>
-</div>
-<div class="preset-info" id="presetInfo"></div>
-</div>
-
-<hr class="divider"/>
-
 <h3 style="font-size:.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:12px">✏️ หรือกรอกเอง</h3>
 <div class="form-row">
 <div class="form-group">
@@ -260,7 +285,7 @@ tbody tr.just-reset{animation:flashGreen 1s ease}
 </div>
 <div class="form-group">
 <label>MAP / แผนที่</label>
-<input type="text" id="bossMap" placeholder="เช่น EP 10 Area"/>
+<input type="text" id="bossMap" placeholder="เช่น Map 103"/>
 </div>
 <div class="form-group">
 <label>CH</label>
@@ -363,66 +388,80 @@ try{
 // ===== EP-based Boss Database =====
 const EP_BOSSES={
   "EP 2":[
-    {name:"Cowardly Cyclops",type:"world"},
-    {name:"Strong Nepenthes",type:"world"},
-    {name:"Strong Malletwyvern",type:"world"},
-    {name:"Strong Throneweaver",type:"world"},
-    {name:"Strong Necrovanter",type:"world"}
+    {name:"Cowardly Cyclops",type:"world",maps:["038"]},
+    {name:"Strong Nepenthes",type:"world",maps:["039"]},
+    {name:"Strong Malletwyvern",type:"world",maps:["040"]},
+    {name:"Strong Throneweaver",type:"world",maps:["041"]},
+    {name:"Strong Necrovanter",type:"world",maps:["042"]}
   ],
   "EP 3":[
-    {name:"Strong Iltiswort",type:"world"},
-    {name:"Cowardly Mummygust",type:"world"},
-    {name:"Strong Velniamonkey",type:"world"},
-    {name:"Indignant Deathweaver",type:"world"}
+    {name:"Strong Iltiswort",type:"world",maps:["049"]},
+    {name:"Cowardly Mummygust",type:"world",maps:["050"]},
+    {name:"Strong Velniamonkey",type:"world",maps:["051"]},
+    {name:"Indignant Deathweaver",type:"world",maps:["052"]}
   ],
   "EP 4":[
-    {name:"Cowardly Clymen",type:"world"},
-    {name:"Strong Mothtem",type:"world"},
-    {name:"Indignant Hydra",type:"world"},
-    {name:"Strong Tutu",type:"world"}
+    {name:"Cowardly Clymen",type:"world",maps:["058"]},
+    {name:"Strong Mothtem",type:"world",maps:["059"]},
+    {name:"Indignant Hydra",type:"world",maps:["060"]},
+    {name:"Strong Tutu",type:"world",maps:["061"]}
   ],
   "EP 5":[
-    {name:"Strong Grinender",type:"world"},
-    {name:"Cowardly Reaverpede",type:"world"},
-    {name:"Indignant Red Rambandgad",type:"world"}
+    {name:"Strong Grinender",type:"world",maps:["067"]},
+    {name:"Cowardly Reaverpede",type:"world",maps:["068"]},
+    {name:"Indignant Red Rambandgad",type:"world",maps:["069"]}
   ],
   "EP 6":[
-    {name:"Strong Archon",type:"world"},
-    {name:"Strong Chafer",type:"world"},
-    {name:"Cowardly Manticen",type:"world"},
-    {name:"Indignant Bramble",type:"world"},
-    {name:"Strong Taumas",type:"world"}
+    {name:"Strong Archon",type:"world",maps:["075"]},
+    {name:"Strong Chafer",type:"world",maps:["076"]},
+    {name:"Cowardly Manticen",type:"world",maps:["077"]},
+    {name:"Indignant Bramble",type:"world",maps:["078"]},
+    {name:"Strong Taumas",type:"world",maps:["079"]}
   ],
   "EP 7":[
-    {name:"Strong Gorkas",type:"world"},
-    {name:"Strong Thumlord",type:"world"},
-    {name:"Angry Rexipher",type:"world"},
-    {name:"Cowardly Vearkaras",type:"world"}
+    {name:"Strong Gorkas",type:"world",maps:["085"]},
+    {name:"Strong Thumlord",type:"world",maps:["086"]},
+    {name:"Angry Rexipher",type:"world",maps:["087"]},
+    {name:"Cowardly Vearkaras",type:"world",maps:["088"]}
   ],
   "EP 8":[
-    {name:"Strong Dionysus",type:"world"},
-    {name:"Angry Demon Lord Hauberk",type:"world"},
-    {name:"Cowardly Nuaele",type:"world"},
-    {name:"Strong Blood",type:"world"},
-    {name:"Strong Corrupted",type:"world"},
-    {name:"Cowardly Scorpio",type:"world"}
+    {name:"Strong Dionysus",type:"world",maps:["094"]},
+    {name:"Angry Demon Lord Hauberk",type:"world",maps:["095"]},
+    {name:"Cowardly Nuaele",type:"world",maps:["096"]},
+    {name:"Strong Blood",type:"world",maps:["097"]},
+    {name:"Strong Corrupted",type:"world",maps:["098"]},
+    {name:"Cowardly Scorpio",type:"world",maps:["099"]}
   ],
   "EP 9":[
-    {name:"Strong Chapparition",type:"world"},
-    {name:"Strong Salamander",type:"world"},
-    {name:"Cowardly Devilglove",type:"world"},
-    {name:"Strong Mineloader",type:"world"},
-    {name:"Indignant Helga Sircle",type:"world"}
+    {name:"Strong Chapparition",type:"world",maps:["100"]},
+    {name:"Strong Salamander",type:"world",maps:["101"]},
+    {name:"Cowardly Devilglove",type:"world",maps:["102"]},
+    {name:"Strong Mineloader",type:"world",maps:["103"]},
+    {name:"Indignant Helga Sircle",type:"world",maps:["104"]}
   ],
   "EP 10":[
-    {name:"Strong Fireload",type:"world"},
-    {name:"Strong Riteris",type:"world"},
-    {name:"Cowardly Glackuman",type:"world"},
-    {name:"Indignant Naktis",type:"world"}
+    {name:"Strong Fireload",type:"world",maps:["110"]},
+    {name:"Strong Riteris",type:"world",maps:["111"]},
+    {name:"Cowardly Glackuman",type:"world",maps:["112"]},
+    {name:"Indignant Naktis",type:"world",maps:["113"]}
   ]
 };
 
-let currentEP=null;
+// ===== Map Number to Boss Lookup =====
+// Build automatically from EP_BOSSES
+const MAP_BOSSES={};
+Object.entries(EP_BOSSES).forEach(([ep,bossList])=>{
+  bossList.forEach(b=>{
+    if(b.maps){
+      b.maps.forEach(m=>{
+        const key=String(parseInt(m,10)); // normalize: "038" -> "38", "103" -> "103"
+        if(!MAP_BOSSES[key]) MAP_BOSSES[key]=[];
+        MAP_BOSSES[key].push({...b,ep});
+      });
+    }
+  });
+});
+
 let bosses=[];
 try{bosses=JSON.parse(localStorage.getItem("tosmBossTimers")||"[]");if(!Array.isArray(bosses))bosses=[];}catch(e){console.warn("Failed to parse saved bosses, resetting.",e);bosses=[];}
 const _nowInit = Date.now();
@@ -468,6 +507,8 @@ function selectPhase(phase){
     btn.classList.toggle("active",parseInt(btn.dataset.phase)===phase);
   });
   updatePhasePreview();
+  // Re-parse quick input if there's content (update time for new phase)
+  parseQuickInput();
 }
 
 function updatePhasePreview(){
@@ -485,85 +526,126 @@ function updatePhasePreview(){
   }
 }
 
-// ===== EP Tab Functions =====
-function initEPTabs(){
-  const container=document.getElementById("epTabs");
-  container.innerHTML="";
-  Object.keys(EP_BOSSES).forEach(ep=>{
-    const btn=document.createElement("button");
-    btn.className="ep-tab";
-    btn.textContent=ep;
-    btn.onclick=()=>selectEP(ep);
-    container.appendChild(btn);
-  });
-}
+// ===== Quick Input Functions =====
+let quickParsed=null;
 
-function selectEP(ep){
-  currentEP=ep;
-  document.querySelectorAll(".ep-tab").forEach(tab=>{
-    tab.classList.toggle("active",tab.textContent===ep);
-  });
-  const select=document.getElementById("bossPreset");
-  const bossList=EP_BOSSES[ep]||[];
-  select.innerHTML=`<option value="">— เลือกบอสจาก ${ep} —</option>`;
-  bossList.forEach((b,i)=>{
-    const typeEmoji={field:"🟢",world:"🟡",demon:"🔴"};
-    const opt=document.createElement("option");
-    opt.value=ep+"_"+i;
-    opt.textContent=`${typeEmoji[b.type]||"🟡"} ${b.name}`;
-    select.appendChild(opt);
-  });
-  document.getElementById("presetInfo").classList.remove("show");
-}
-
-// ===== Preset Functions =====
-function applyPreset(){
-  const sel=document.getElementById("bossPreset").value;
-  const info=document.getElementById("presetInfo");
-  if(!sel){info.classList.remove("show");return}
-  const parts=sel.split("_");
-  const epKey=parts.slice(0,-1).join("_").replaceAll("_"," ");
-  const idx=parseInt(parts[parts.length-1]);
-  const epBosses=EP_BOSSES[epKey];
-  if(!epBosses||!epBosses[idx]){info.classList.remove("show");return}
-  const p=epBosses[idx];
-  // Fill form
-  document.getElementById("bossName").value=p.name;
-  document.getElementById("bossType").value=p.type;
-  document.getElementById("bossMap").value=epKey;
-  syncRespawnInput();
-  // Show info
-  const typeEmoji={field:"🟢",world:"🟡",demon:"🔴"};
-  const mins=PHASE_MINUTES[currentPhase];
+function parseQuickInput(){
+  const raw=document.getElementById("quickInput").value.trim();
+  const preview=document.getElementById("quickPreview");
+  const btn=document.getElementById("quickAddBtn");
+  
+  if(!raw){preview.classList.remove("show");btn.disabled=true;quickParsed=null;return}
+  
+  // Parse format: MAP/CH/PHASE
+  const parts=raw.split(/[\/\s,.-]+/).filter(p=>p.length>0);
+  if(parts.length<2){preview.classList.remove("show");btn.disabled=true;quickParsed=null;return}
+  
+  const mapNum=parts[0];
+  const ch=parts[1]||"1";
+  const phase=parts.length>=3?parseInt(parts[2]):null;
+  
+  // If phase was specified in quick input, update the phase selector too
+  if(phase && phase>=1 && phase<=4){
+    selectPhaseQuiet(phase);
+  }
+  
+  const usePhase=phase && phase>=1 && phase<=4 ? phase : currentPhase;
+  const mins=PHASE_MINUTES[usePhase];
   const spawnTime=addMinutesToNow(mins);
-  const ch=document.getElementById("presetChannel").value||"1";
-  info.innerHTML=`${typeEmoji[p.type]||""} <strong>${p.name}</strong> | ${TYPE_LABELS[p.type]} | 📍 ${epKey} (CH ${ch}) | 🔥 เฟส ${currentPhase} (+${mins} นาที) → เกิดตอน <strong>${spawnTime}</strong>`;
-  info.classList.add("show");
+  
+  // Update preview tags
+  document.getElementById("qpMap").textContent=`📍 Map ${mapNum}`;
+  document.getElementById("qpCh").textContent=`📺 CH ${ch}`;
+  document.getElementById("qpPhase").textContent=`🔥 เฟส ${usePhase} (+${mins}น.)`;
+  document.getElementById("qpTime").textContent=`⏰ ${spawnTime}`;
+  
+  // Find bosses matching this map
+  const mapKey=String(parseInt(mapNum,10));
+  const matchedBosses=MAP_BOSSES[mapKey]||[];
+  const bossSelect=document.getElementById("quickBossSelect");
+  
+  if(matchedBosses.length===1){
+    // Auto-select if only one boss on this map
+    const b=matchedBosses[0];
+    bossSelect.innerHTML=`<option value="0" selected>🟡 ${b.name}</option>`;
+  } else if(matchedBosses.length>1){
+    bossSelect.innerHTML=`<option value="">— เลือกบอส (${matchedBosses.length} ตัว) —</option>`;
+    matchedBosses.forEach((b,i)=>{
+      const emoji={field:"🟢",world:"🟡",demon:"🔴"};
+      bossSelect.innerHTML+=`<option value="${i}">${emoji[b.type]||"🟡"} ${b.name}</option>`;
+    });
+  } else {
+    // No matching boss — use channel number as name
+    bossSelect.innerHTML=`<option value="auto_ch" selected>📺 CH ${ch} (ใช้เลข CH เป็นชื่อ)</option>`;
+  }
+  
+  quickParsed={mapNum,ch:String(parseInt(ch,10)||1),phase:usePhase,matchedBosses};
+  preview.classList.add("show");
+  btn.disabled=false;
 }
 
-function addPresetBoss(){
-  const sel=document.getElementById("bossPreset").value;
-  if(!sel){showToast("⚠️","กรุณาเลือกบอสจาก EP","");return}
-  const parts=sel.split("_");
-  const epKey=parts.slice(0,-1).join("_").replace("_"," ");
-  const idx=parseInt(parts[parts.length-1]);
-  const epBosses=EP_BOSSES[epKey];
-  if(!epBosses||!epBosses[idx])return;
-  const p=epBosses[idx];
-  const mins=PHASE_MINUTES[currentPhase];
+// Select phase without re-parsing quick input (avoid loop)
+function selectPhaseQuiet(phase){
+  currentPhase=phase;
+  document.querySelectorAll(".phase-btn").forEach(btn=>{
+    btn.classList.toggle("active",parseInt(btn.dataset.phase)===phase);
+  });
+  // Update phase preview text
+  const mins=PHASE_MINUTES[phase];
+  const phaseStr=document.getElementById("phaseResultPhaseStr");
+  const minsStr=document.getElementById("phaseResultMinsStr");
+  const preview=document.getElementById("phaseTimePreview");
+  if(phaseStr)phaseStr.textContent=`เฟส ${phase}`;
+  if(minsStr)minsStr.textContent=`+${mins}`;
+  if(preview)preview.textContent=addMinutesToNow(mins);
+}
+
+function updateQuickPreviewBoss(){}
+
+function quickAddBoss(){
+  if(!quickParsed)return;
+  const {mapNum,ch,phase,matchedBosses}=quickParsed;
+  const bossSelect=document.getElementById("quickBossSelect");
+  const selVal=bossSelect.value;
+  
+  let selectedBoss=null;
+  if(selVal===""){showToast("⚠️","กรุณาเลือกบอส","");return}
+  
+  if(selVal==="auto_ch"){
+    // Boss outside known EP — use channel number as name
+    selectedBoss={name:`CH ${ch}`,type:"world",maps:[mapNum]};
+  } else {
+    const idx=parseInt(selVal);
+    if(matchedBosses&&matchedBosses[idx])selectedBoss=matchedBosses[idx];
+  }
+  
+  if(!selectedBoss){showToast("⚠️","ไม่พบบอสที่เลือก","");return}
+  
+  const mins=PHASE_MINUTES[phase];
   const time=addMinutesToNow(mins);
-  const spawnTimestamp = Date.now() + mins * 60000;
-  const ch=document.getElementById("presetChannel").value||"1";
+  const spawnTimestamp=Date.now()+mins*60000;
+  
   bosses.push({
     id:generateId(),
-    name:p.name,type:p.type,map:epKey,time,timestamp:spawnTimestamp,
-    customRespawn:DEFAULT_RESPAWN[p.type]||4,
-    phase:currentPhase,ep:epKey,channel:ch
+    name:selectedBoss.name,
+    type:selectedBoss.type,
+    map:`Map ${mapNum}`,
+    time,
+    timestamp:spawnTimestamp,
+    customRespawn:DEFAULT_RESPAWN[selectedBoss.type]||4,
+    phase:phase,
+    channel:ch
   });
+  
   saveBosses();renderTable();
-  showToast("📥",`เพิ่ม ${p.name}`,`${epKey} (CH ${ch}) | เฟส ${currentPhase} (+${mins} นาที) → เกิดตอน ${time}`,true);
-  document.getElementById("bossPreset").value="";
-  document.getElementById("presetInfo").classList.remove("show");
+  showToast("⚡",`เพิ่ม ${selectedBoss.name}`,`Map ${mapNum} CH ${ch} | เฟส ${phase} (+${mins}น.) → ${time}`,true);
+  
+  // Reset quick input
+  document.getElementById("quickInput").value="";
+  document.getElementById("quickPreview").classList.remove("show");
+  document.getElementById("quickAddBtn").disabled=true;
+  quickParsed=null;
+  document.getElementById("quickInput").focus();
   if(!muted)getAudioCtx();
 }
 
@@ -581,7 +663,7 @@ function addBoss(){
   target.setHours(+p[0], +p[1], 0, 0);
   let ts = target.getTime();
   if(ts < Date.now() - 43200000) ts += 86400000;
-  bosses.push({id:generateId(),name:n.value.trim(),type:t.value,map:m.value.trim(),time:rawTime+":00",timestamp:ts,customRespawn:respawn,phase:null,ep:m.value.trim(),channel:ch});
+  bosses.push({id:generateId(),name:n.value.trim(),type:t.value,map:m.value.trim(),time:rawTime+":00",timestamp:ts,customRespawn:respawn,phase:null,channel:ch});
   saveBosses();renderTable();showToast("✅",`เพิ่ม ${n.value.trim()} แล้ว`,`เวลาเกิด ${rawTime} (CH ${ch})`,true);
   n.value="";m.value="";ti.value="";n.focus();if(!muted)getAudioCtx();
 }
@@ -594,7 +676,7 @@ function addBossWithPhase(){
   const time=addMinutesToNow(mins);
   const ts = Date.now() + mins * 60000;
   const respawn=getRespawnHours();
-  bosses.push({id:generateId(),name:n.value.trim(),type:t.value,map:m.value.trim(),time,timestamp:ts,customRespawn:respawn,phase:currentPhase,ep:m.value.trim(),channel:ch});
+  bosses.push({id:generateId(),name:n.value.trim(),type:t.value,map:m.value.trim(),time,timestamp:ts,customRespawn:respawn,phase:currentPhase,channel:ch});
   saveBosses();renderTable();showToast("⚡",`เพิ่ม ${n.value.trim()}`,`เฟส ${currentPhase} (+${mins} นาที) → เกิดตอน ${time} (CH ${ch})`,true);
   n.value="";m.value="";document.getElementById("bossTime").value="";n.focus();if(!muted)getAudioCtx();
 }
@@ -651,13 +733,13 @@ function renderTable(){
     ?`<span class="respawn-edit-wrap"><input type="number" id="rs-edit-${b.id}" class="respawn-input-inline" value="${hours}" min="0.5" max="72" step="0.5" onkeydown="if(event.key==='Enter')saveRespawn('${b.id}');if(event.key==='Escape')cancelEditRespawn()"/><button class="btn-save-rs" onclick="saveRespawn('${b.id}')">✓</button></span>`
     :`<span class="respawn-edit-wrap"><span style="font-size:.78rem;color:var(--accent);font-weight:700">${hours} ชม.</span><button class="btn-edit" onclick="startEditRespawn('${b.id}')" title="แก้ไขเวลา Respawn">✏️</button></span>`;
     const phaseLabel=b.phase?`<span class="phase-badge">เฟส ${b.phase}</span>`:"";
-    const epLabel=b.ep||b.map||"";
+    const mapLabel=b.map||"";
     const chLabel=b.channel?`<br/><span style="color:var(--text-muted);font-weight:600;font-size:0.75rem;">CH ${b.channel}</span>`:"";
     return`<tr class="${ac}" data-id="${b.id}">
     <td><span class="status-dot ${sd}"></span></td>
     <td class="map-name">${escapeHtml(b.name)}${phaseLabel}</td>
     <td><span class="type-badge ${TYPE_CSS[b.type]||"type-world"}">${TYPE_LABELS[b.type]||b.type}</span></td>
-    <td style="font-size:.78rem;line-height:1.4">${escapeHtml(epLabel)}${chLabel}</td>
+    <td style="font-size:.78rem;line-height:1.4">${escapeHtml(mapLabel)}${chLabel}</td>
     <td style="font-size:.75rem;color:var(--text-secondary)">${b.phase?"เฟส "+b.phase:"-"}</td>
     <td class="time-display">${b.time}</td>
     <td><span class="countdown ${cc}">${formatCountdown(diff)}</span></td>
@@ -674,9 +756,9 @@ function renderTable(){
     ?`<span class="respawn-edit-wrap"><input type="number" id="rs-edit-${b.id}" class="respawn-input-inline" value="${hours}" min="0.5" max="72" step="0.5" onkeydown="if(event.key==='Enter')saveRespawn('${b.id}');if(event.key==='Escape')cancelEditRespawn()"/><button class="btn-save-rs" onclick="saveRespawn('${b.id}')">✓</button></span>`
     :`<span class="respawn-edit-wrap"><span>${hours}ชม.</span><button class="btn-edit" onclick="startEditRespawn('${b.id}')" title="แก้ไข">✏️</button></span>`;
     const phaseLabel=b.phase?`<span class="phase-badge">เฟส ${b.phase}</span>`:"";
-    const epLabel=b.ep||b.map||"";
+    const mapLabel=b.map||"";
     const chLabel=b.channel?` | CH ${b.channel}`:"";
-    return`<div class="boss-card ${ac}" data-id="${b.id}"><div class="boss-card-top"><div class="boss-card-info"><h3><span class="status-dot ${sd}"></span>${escapeHtml(b.name)}${phaseLabel}</h3><div class="boss-card-meta"><span class="type-badge ${TYPE_CSS[b.type]||"type-world"}">${TYPE_LABELS[b.type]||b.type}</span>${epLabel?`<span>📍 ${escapeHtml(epLabel)}${chLabel}</span>`:""}</div></div><button class="btn btn-sm btn-danger" onclick="deleteBoss('${b.id}')">✕</button></div><div class="boss-card-bottom"><div class="boss-card-countdown"><span class="countdown-label">นับถอยหลัง</span><span class="countdown ${cc}">${formatCountdown(diff)}</span><span class="boss-card-time">🕐 ${b.time} | Respawn ${mobileRespawn}</span></div><div class="boss-card-actions"><label class="kill-toggle"><input type="checkbox" onchange="markBossKilled('${b.id}')"/><span class="toggle-track"></span><span class="toggle-label">ตายแล้ว</span></label></div></div></div>`}).join("")}
+    return`<div class="boss-card ${ac}" data-id="${b.id}"><div class="boss-card-top"><div class="boss-card-info"><h3><span class="status-dot ${sd}"></span>${escapeHtml(b.name)}${phaseLabel}</h3><div class="boss-card-meta"><span class="type-badge ${TYPE_CSS[b.type]||"type-world"}">${TYPE_LABELS[b.type]||b.type}</span>${mapLabel?`<span>📍 ${escapeHtml(mapLabel)}${chLabel}</span>`:""}</div></div><button class="btn btn-sm btn-danger" onclick="deleteBoss('${b.id}')">✕</button></div><div class="boss-card-bottom"><div class="boss-card-countdown"><span class="countdown-label">นับถอยหลัง</span><span class="countdown ${cc}">${formatCountdown(diff)}</span><span class="boss-card-time">🕐 ${b.time} | Respawn ${mobileRespawn}</span></div><div class="boss-card-actions"><label class="kill-toggle"><input type="checkbox" onchange="markBossKilled('${b.id}')"/><span class="toggle-track"></span><span class="toggle-label">ตายแล้ว</span></label></div></div></div>`}).join("")}
 
 function updateTimers() {
   const now = new Date();
@@ -764,7 +846,7 @@ function initConnectionStatus(){
 }
 
 // Initialize
-initEPTabs();
+
 updatePhasePreview();
 renderTable();
 document.getElementById("roomInput").value=currentRoom;
